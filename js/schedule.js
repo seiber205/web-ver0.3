@@ -1,13 +1,20 @@
 const defaultShifts = [
-  { time: 'Ca 1: 6h-9h', note: '', icon: '' },
-  { time: 'Ca 2: 9h-12h', note: '', icon: '' },
-  { time: 'Ca 3: 12h-15h', note: '', icon: '' },
-  { time: 'Ca 4: 15h-18h', note: '', icon: '' },
-  { time: 'Ca 5: 18h-21h', note: '', icon: '' },
-  { time: 'Ca 6: 21h-24h', note: '', icon: '' }
+  { time: 'Ca 1: 6h-8h', note: '', icon: '' },
+  { time: 'Ca 2: 8h-10h', note: '', icon: '' },
+  { time: 'Ca 3: 10h-12h', note: '', icon: '' },
+  { time: 'Ca 4: 12h-14h', note: '', icon: '' },
+  { time: 'Ca 5: 14h-16h', note: '', icon: '' },
+  { time: 'Ca 6: 16h-18h', note: '', icon: '' },
+  { time: 'Ca 7: 18h-20h', note: '', icon: '' },
+  { time: 'Ca 8: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 9: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 10: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 11: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 12: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 13: 20h-22h', note: '', icon: '' },
 ];
 
-// Tạo lịch rỗng: 7 ngày x 6 ca
+// Tạo lịch rỗng: 7 ngày x 7 ca
 function generateEmptySchedule() {
   return Array.from({ length: 7 }, () => defaultShifts.map(s => ({ ...s })));
 }
@@ -24,9 +31,9 @@ function getUserSchedule() {
   console.log('User Data:', userData); // Debug
   if (!userData[username]) userData[username] = {};
 
-  if (!Array.isArray(userData[username].schedule)) {
+  if (!Array.isArray(userData[username].schedule) || userData[username].schedule[0].length !== defaultShifts.length) {
     userData[username].schedule = generateEmptySchedule();
-    console.log('Initialized empty schedule:', userData[username].schedule); // Debug
+    console.log('Initialized new schedule with updated shifts:', userData[username].schedule); // Debug
   }
 
   localStorage.setItem('userData', JSON.stringify(userData));
@@ -63,7 +70,6 @@ function loadSchedule() {
 
   for (let shiftIndex = 0; shiftIndex < defaultShifts.length; shiftIndex++) {
     const row = document.createElement('tr');
-    // Sử dụng schedule[0][shiftIndex].time thay vì defaultShifts để hiển thị giờ ca đã lưu
     row.innerHTML = `<td>${schedule[0][shiftIndex].time}</td>`;
 
     for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
@@ -77,7 +83,6 @@ function loadSchedule() {
     tbody.appendChild(row);
   }
 
-  // Cập nhật dropdown chọn ca
   const shiftSelect = document.getElementById('edit-shift');
   if (shiftSelect) {
     shiftSelect.innerHTML = defaultShifts
@@ -88,11 +93,11 @@ function loadSchedule() {
 
 function getIcon(icon) {
   switch (icon) {
-    case 'work': return ' 🔴🏃 ';
-    case 'study': return '🟠🎓 ';
-    case 'extra': return '🟣📚';
-    case 'play': return '🟢🎮';
-    case 'other': return '⭕📌';
+    case 'work': return '🏃';
+    case 'study': return '🎓';
+    case 'extra': return '📚';
+    case 'play': return '🎮';
+    case 'other': return '📌';
     default: return '';
   }
 }
@@ -113,19 +118,16 @@ document.getElementById('schedule-form').addEventListener('submit', (e) => {
   const schedule = getUserSchedule();
   if (!schedule) return;
 
-  // Cập nhật ca cụ thể
   if (!Array.isArray(schedule[day])) {
     schedule[day] = defaultShifts.map(s => ({ ...s }));
   }
 
-  // Cập nhật tất cả các ngày với giờ ca mới nếu time không rỗng
   if (time) {
     for (let i = 0; i < 7; i++) {
       schedule[i][shift].time = time;
     }
   }
 
-  // Cập nhật ghi chú và icon cho ca cụ thể
   schedule[day][shift].note = note;
   schedule[day][shift].icon = icon;
 
@@ -135,7 +137,6 @@ document.getElementById('schedule-form').addEventListener('submit', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Chỉ gọi loadSchedule nếu schedule-section đang hiển thị
   if (document.getElementById('schedule-section').style.display === 'block') {
     loadSchedule();
   }
