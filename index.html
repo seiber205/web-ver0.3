@@ -14,7 +14,7 @@
     <div class="auth-container">
       <h2 id="auth-title">Đăng nhập</h2>
       <form id="auth-form">
-        <input type="text" id="username" placeholder="Tên đăng nhập" required />
+        <input type="email" id="username" placeholder="Email" required />
         <input type="password" id="password" placeholder="Mật khẩu" required />
         <button type="submit" id="auth-btn">Đăng nhập</button>
       </form>
@@ -92,11 +92,11 @@
           <label>Icon hoạt động:</label>
           <select id="shift-icon">
             <option value="">❌ Không chọn</option>
-            <option value="work">🔴 🏃 Đi làm</option>
-            <option value="study">🟠 🎓 Đi học</option>
-            <option value="extra">🟣📚 Học thêm</option>
-            <option value="play">🟢 🎮 Đi chơi</option>
-            <option value="other">⭕ 📌 Khác</option>
+            <option value="work">🏃 Đi làm</option>
+            <option value="study">🎓 Đi học</option>
+            <option value="extra">📚 Học thêm</option>
+            <option value="play">🎮 Đi chơi</option>
+            <option value="other">📌 Khác</option>
           </select>
           <button type="submit">💾 Lưu thay đổi</button>
         </form>
@@ -104,6 +104,25 @@
     </div>
   </div>
 
+  <!-- ✅ Dùng Firebase SDK bản compat (v9) để dùng firebase.auth(), firestore... -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfl9q94MOE7XlxcPZBcobcDZBvJvjVgNk",
+      authDomain: "myapp-49f38.firebaseapp.com",
+      projectId: "myapp-49f38",
+      storageBucket: "myapp-49f38.firebasestorage.app",
+      messagingSenderId: "974202894063",
+      appId: "1:974202894063:web:a0bc790d0863fb8c95cd1a",
+      measurementId: "G-MTN1WFF8RC"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- Sau khi khởi tạo Firebase thì mới load các file logic -->
   <script src="js/auth.js"></script>
   <script src="js/calculator.js"></script>
   <script src="js/schedule.js"></script>
