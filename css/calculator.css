@@ -1,0 +1,128 @@
+#calculator-section {
+    max-width: 600px;
+    margin: 40px auto;
+    background: linear-gradient(135deg, #e0f7fa, #f1f8ff);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.6s ease;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#calculator-section h2 {
+    text-align: center;
+    color: #00796b;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+#calculator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+#calculator-form label {
+    font-weight: 600;
+    color: #37474f;
+    font-size: 16px;
+}
+
+#calculator-form input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #b0bec5;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#calculator-form input:focus {
+    border-color: #00acc1;
+    box-shadow: 0 0 8px rgba(0, 172, 193, 0.3);
+    outline: none;
+}
+
+#calculator-form button {
+    padding: 14px;
+    border: none;
+    background: linear-gradient(45deg, #00acc1, #00796b);
+    color: white;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+}
+
+#calculator-form button:hover {
+    background: linear-gradient(45deg, #00838f, #00695c);
+    transform: translateY(-2px);
+}
+
+#calculator-form button:active {
+    transform: scale(0.98);
+}
+
+#result {
+    margin-top: 30px;
+    padding: 20px;
+    background: #e8f5e9;
+    border-radius: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #2e7d32;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    animation: slideIn 0.4s ease;
+}
+
+/* Thanh highlight phía trên */
+#result::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 5px;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    border-radius: 999px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 600px) {
+    #calculator-section {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    #calculator-form label {
+        font-size: 15px;
+    }
+
+    #calculator-form input {
+        font-size: 15px;
+    }
+
+    #calculator-form button {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    #result {
+        font-size: 18px;
+        padding: 16px;
+    }
+}
