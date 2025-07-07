@@ -1,80 +1,87 @@
 const defaultShifts = [
-  { time: 'Ca 1: 6h-8h', note: '', icon: '' },
-  { time: 'Ca 2: 8h-10h', note: '', icon: '' },
-  { time: 'Ca 3: 10h-12h', note: '', icon: '' },
-  { time: 'Ca 4: 12h-14h', note: '', icon: '' },
-  { time: 'Ca 5: 14h-16h', note: '', icon: '' },
-  { time: 'Ca 6: 16h-18h', note: '', icon: '' },
-  { time: 'Ca 7: 18h-20h', note: '', icon: '' },
-  { time: 'Ca 8: 20h-22h', note: '', icon: '' },
-  { time: 'Ca 9: 20h-22h', note: '', icon: '' },
-  { time: 'Ca 10: 20h-22h', note: '', icon: '' },
-  { time: 'Ca 11: 20h-22h', note: '', icon: '' },
-  { time: 'Ca 12: 20h-22h', note: '', icon: '' },
-  { time: 'Ca 13: 20h-22h', note: '', icon: '' },
+  { time: 'Ca 1: 6h-7h30', note: '', icon: '' },
+  { time: 'Ca 2: 7h30-9h', note: '', icon: '' },
+  { time: 'Ca 3: 9h-10h30', note: '', icon: '' },
+  { time: 'Ca 4: 10h30-12h', note: '', icon: '' },
+  { time: 'Ca 5: 12h-13h30', note: '', icon: '' },
+  { time: 'Ca 6: 13h30-15h', note: '', icon: '' },
+  { time: 'Ca 7: 15h-16h30', note: '', icon: '' },
+  { time: 'Ca 8: 16h30-18h', note: '', icon: '' },
+  { time: 'Ca 9: 18h-19h30', note: '', icon: '' },
+  { time: 'Ca 10: 19h30-21h', note: '', icon: '' },
+  { time: 'Ca 11: 21h-22h30', note: '', icon: '' },
+  { time: 'Ca 12: 22h30-0h', note: '', icon: '' },
+  { time: 'Ca 13: 0h-1h30', note: '', icon: '' }
 ];
 
-// Tạo lịch rỗng: 7 ngày x 7 ca
+// ✅ schedule là object có key từ "0" đến "6"
 function generateEmptySchedule() {
-  return Array.from({ length: 7 }, () => defaultShifts.map(s => ({ ...s })));
+  const schedule = {};
+  for (let i = 0; i < 7; i++) {
+    schedule[i] = defaultShifts.map(s => ({ ...s }));
+  }
+  return schedule;
 }
 
-function getUserSchedule() {
-  const username = localStorage.getItem('currentUser');
-  console.log('Current User:', username); // Debug
-  if (!username) {
+async function getUserSchedule() {
+  const userId = localStorage.getItem('currentUser');
+  if (!userId) {
     console.error('No user logged in');
     return null;
   }
 
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-  console.log('User Data:', userData); // Debug
-  if (!userData[username]) userData[username] = {};
+  const db = firebase.firestore();
+  const userDoc = await db.collection('users').doc(userId).get();
 
-  if (!Array.isArray(userData[username].schedule) || userData[username].schedule[0].length !== defaultShifts.length) {
-    userData[username].schedule = generateEmptySchedule();
-    console.log('Initialized new schedule with updated shifts:', userData[username].schedule); // Debug
+  let schedule = userDoc.data()?.schedule;
+  let reset = false;
+
+  if (!schedule || typeof schedule !== 'object') {
+    reset = true;
+  } else {
+    for (let i = 0; i < 7; i++) {
+      if (!Array.isArray(schedule[i]) || schedule[i].length !== defaultShifts.length) {
+        reset = true;
+        break;
+      }
+    }
   }
 
-  localStorage.setItem('userData', JSON.stringify(userData));
-  return userData[username].schedule;
+  if (reset) {
+    schedule = generateEmptySchedule();
+    await db.collection('users').doc(userId).set({ schedule }, { merge: true });
+  }
+
+  return schedule;
 }
 
-function saveUserSchedule(schedule) {
-  const username = localStorage.getItem('currentUser');
-  if (!username) {
-    console.error('No user logged in, cannot save schedule');
+async function saveUserSchedule(schedule) {
+  const userId = localStorage.getItem('currentUser');
+  if (!userId) {
+    console.error('No user logged in');
     return;
   }
 
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-  userData[username] = userData[username] || {};
-  userData[username].schedule = schedule;
-  localStorage.setItem('userData', JSON.stringify(userData));
-  console.log('Schedule saved:', schedule); // Debug
+  const db = firebase.firestore();
+  await db.collection('users').doc(userId).set({ schedule }, { merge: true });
 }
 
-function loadSchedule() {
-  const schedule = getUserSchedule();
-  if (!schedule) {
-    console.error('No schedule data available');
-    return;
-  }
+async function loadSchedule() {
+  const schedule = await getUserSchedule();
+  if (!schedule) return;
 
   const tbody = document.getElementById('schedule-body');
-  if (!tbody) {
-    console.error('Schedule body element not found');
-    return;
-  }
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   for (let shiftIndex = 0; shiftIndex < defaultShifts.length; shiftIndex++) {
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${schedule[0][shiftIndex].time}</td>`;
+    const shiftTime = schedule[0]?.[shiftIndex]?.time || defaultShifts[shiftIndex].time;
+    row.innerHTML = `<td>${shiftTime}</td>`;
 
     for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-      const shift = schedule[dayIndex][shiftIndex];
-      console.log(`Day ${dayIndex}, Shift ${shiftIndex}:`, shift); // Debug
+      const dayKey = String(dayIndex);
+      const shift = schedule[dayKey]?.[shiftIndex] || { icon: '', note: '' };
       const icon = shift.icon ? getIcon(shift.icon) + ' ' : '';
       const note = shift.note || '';
       row.innerHTML += `<td>${icon}${note}</td>`;
@@ -86,7 +93,7 @@ function loadSchedule() {
   const shiftSelect = document.getElementById('edit-shift');
   if (shiftSelect) {
     shiftSelect.innerHTML = defaultShifts
-      .map((shift, idx) => `<option value="${idx}">${schedule[0][idx].time}</option>`)
+      .map((shift, idx) => `<option value="${idx}">${shift.time}</option>`)
       .join('');
   }
 }
@@ -106,34 +113,38 @@ function editSchedule() {
   document.getElementById('edit-schedule').style.display = 'block';
 }
 
-document.getElementById('schedule-form').addEventListener('submit', (e) => {
+document.getElementById('schedule-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const day = parseInt(document.getElementById('edit-day').value);
+  const day = document.getElementById('edit-day').value;
   const shift = parseInt(document.getElementById('edit-shift').value);
   const time = document.getElementById('shift-time').value.trim();
   const note = document.getElementById('shift-note').value;
   const icon = document.getElementById('shift-icon').value;
 
-  const schedule = getUserSchedule();
+  const schedule = await getUserSchedule();
   if (!schedule) return;
 
   if (!Array.isArray(schedule[day])) {
     schedule[day] = defaultShifts.map(s => ({ ...s }));
   }
 
+  // ✅ Sửa lỗi không cập nhật giờ cho tất cả các ngày
   if (time) {
     for (let i = 0; i < 7; i++) {
-      schedule[i][shift].time = time;
+      const dayKey = String(i);
+      if (Array.isArray(schedule[dayKey]) && schedule[dayKey][shift]) {
+        schedule[dayKey][shift].time = time;
+      }
     }
   }
 
   schedule[day][shift].note = note;
   schedule[day][shift].icon = icon;
 
-  saveUserSchedule(schedule);
+  await saveUserSchedule(schedule);
   document.getElementById('edit-schedule').style.display = 'none';
-  loadSchedule();
+  await loadSchedule();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
