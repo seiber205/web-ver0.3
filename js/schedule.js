@@ -88,11 +88,11 @@ function loadSchedule() {
 
 function getIcon(icon) {
   switch (icon) {
-    case 'work': return '🏃';
-    case 'study': return '🎓';
-    case 'extra': return '📚';
-    case 'play': return '🎮';
-    case 'other': return '📌';
+    case 'work': return ' 🔴🏃 ';
+    case 'study': return '🟠🎓 ';
+    case 'extra': return '🟣📚';
+    case 'play': return '🟢🎮';
+    case 'other': return '⭕📌';
     default: return '';
   }
 }
