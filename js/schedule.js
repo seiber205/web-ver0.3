@@ -10,8 +10,7 @@ const defaultShifts = [
   { time: 'Ca 9: 18h-19h30', note: '', icon: '' },
   { time: 'Ca 10: 19h30-21h', note: '', icon: '' },
   { time: 'Ca 11: 21h-22h30', note: '', icon: '' },
-  { time: 'Ca 12: 22h30-0h', note: '', icon: '' },
-  { time: 'Ca 13: 0h-1h30', note: '', icon: '' }
+
 ];
 
 // ✅ schedule là object có key từ "0" đến "6"
